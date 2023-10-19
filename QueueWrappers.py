@@ -2,6 +2,7 @@
 #this simplifies certain calls within algorithms
 #and uses python's deque module, which is "list like" but supports fast insert and pop operations from either end
 from collections import deque
+from itertools import count
 
 #heapq is used for the priority queue implementation
 import heapq
@@ -36,27 +37,29 @@ class PriorityQueue:
     def __init__(self):
         self.entries = {}
         self.heap = []
-        self.count = 0
+        self.counter = count()
 
     def __len__(self):
         return len(self.heap)
     def __iter__(self):
         while len(self) > 0:
             return self.pop()
-
-        def push(self,item, priority):
-            if item in self.entries:
-                self.remove(item)
-            count+=1
-            entry = [priority, count, item]
-            self.entries[item] = entry
-            heapq.heappush(self.heap, entry)
-        def remove(self,item):
-            entry = self.entries.pop(item)
-            entry[-1] = "REMOVED"
-        def pop(self):
-            while self.heap:
-                priority,count,item = heapq.heappop(self.heap)
-                if item is not "REMOVED":
-                    del self.entries[item]
-                    return item
+    #push and remove entry if needed
+    def push(self,item, priority):
+        if item in self.entries:
+            self.remove(item)
+        count = next(self.counter)
+        entry = [priority, count, item]
+        self.entries[item] = entry
+        heapq.heappush(self.heap, entry)
+    #mark entry as removed
+    def remove(self,item):
+        entry = self.entries.pop(item)
+        entry[-1] = "REMOVED"
+    #pop least priority non-removed entry
+    def pop(self):
+        while self.heap:
+            priority,count,item = heapq.heappop(self.heap)
+            if item is not "REMOVED":
+                del self.entries[item]
+                return item
